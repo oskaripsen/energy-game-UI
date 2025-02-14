@@ -25,7 +25,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Energy Game',
+      title: 'Energy Game: Guess the Country',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         brightness: Brightness.light,

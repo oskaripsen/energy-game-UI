@@ -74,86 +74,102 @@ class _GuessInputWidgetState extends State<GuessInputWidget> {
 
   @override
   Widget build(BuildContext context) {
+    // Get keyboard height to adjust positioning
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+    
     return Padding(
       padding: EdgeInsets.all(8.0),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: Autocomplete<String>(
-                  optionsBuilder: (TextEditingValue textEditingValue) {
-                    return _getSuggestions(textEditingValue.text);
-                  },
-                  onSelected: (String value) {
-                    setState(() {
-                      _controller.text = value;
-                      _selectedCountry = value;
-                    });
-                  },
-                  fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
-                    _controller = controller;
-                    return TextField(
-                      controller: controller,
-                      focusNode: focusNode,
-                      decoration: InputDecoration(
-                        hintText: 'Enter a country name',
-                        border: OutlineInputBorder(
+          Padding(
+            padding: EdgeInsets.only(bottom: bottomInset > 0 ? bottomInset + 8 : 8),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Autocomplete<String>(
+                    optionsBuilder: (TextEditingValue textEditingValue) {
+                      return _getSuggestions(textEditingValue.text);
+                    },
+                    onSelected: (String value) {
+                      setState(() {
+                        _controller.text = value;
+                        _selectedCountry = value;
+                      });
+                    },
+                    fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
+                      _controller = controller;
+                      return TextField(
+                        controller: controller,
+                        focusNode: focusNode,
+                        decoration: InputDecoration(
+                          hintText: 'Enter a country name',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          filled: true,
+                          fillColor: Theme.of(context).cardColor,
+                        ),
+                        textInputAction: TextInputAction.next,
+                        keyboardType: TextInputType.text,
+                        autocorrect: false,
+                        enableSuggestions: true,
+                      );
+                    },
+                    optionsViewBuilder: (context, onSelected, options) {
+                      // Wrap the suggestions list in a Padding to push it above the keyboard.
+                      return Align(
+                        alignment: Alignment.topLeft,
+                        child: Material(
+                          elevation: 4,
                           borderRadius: BorderRadius.circular(8),
-                        ),
-                        filled: true,
-                        fillColor: Theme.of(context).cardColor,
-                      ),
-                      textInputAction: TextInputAction.next,
-                      keyboardType: TextInputType.text,
-                      autocorrect: false,
-                      enableSuggestions: true,
-                    );
-                  },
-                  optionsViewBuilder: (context, onSelected, options) {
-                    return Align(
-                      alignment: Alignment.topLeft,
-                      child: Material(
-                        elevation: 4,
-                        borderRadius: BorderRadius.circular(8),
-                        child: Container(
-                          constraints: BoxConstraints(
-                            maxHeight: 200,
-                            maxWidth: MediaQuery.of(context).size.width - 32,
-                          ),
-                          child: ListView.builder(
-                            padding: EdgeInsets.zero,
-                            shrinkWrap: true,
-                            itemCount: options.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              final option = options.elementAt(index);
-                              return ListTile(
-                                title: Text(option),
-                                onTap: () => onSelected(option),
-                              );
-                            },
+                          child: Padding(
+                            padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(
+                                maxHeight: MediaQuery.of(context).size.height * 0.3,
+                                maxWidth: MediaQuery.of(context).size.width - 32,
+                              ),
+                              child: ListView.builder(
+                                padding: EdgeInsets.zero,
+                                shrinkWrap: true,
+                                itemCount: options.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  final option = options.elementAt(index);
+                                  return ListTile(
+                                    dense: true,  // Make items more compact
+                                    visualDensity: VisualDensity.compact,
+                                    title: Text(
+                                      option,
+                                      style: TextStyle(fontSize: 14),
+                                    ),
+                                    onTap: () => onSelected(option),
+                                  );
+                                },
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              SizedBox(width: 8),
-              ElevatedButton(
-                onPressed: () => _submitGuess(_controller.text),
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                      );
+                    },
                   ),
                 ),
-                child: Text(
-                  'Guess',
-                  style: TextStyle(fontSize: 16),
+                SizedBox(width: 8),
+                ElevatedButton(
+                  onPressed: () => _submitGuess(_controller.text),
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: Text(
+                    'Guess',
+                    style: TextStyle(fontSize: 16),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
