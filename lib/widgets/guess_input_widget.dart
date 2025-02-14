@@ -103,7 +103,7 @@ class _GuessInputWidgetState extends State<GuessInputWidget> {
                         controller: controller,
                         focusNode: focusNode,
                         decoration: InputDecoration(
-                          hintText: 'Enter a country name',
+                          hintText: 'Enter a country name!',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
