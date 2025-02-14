@@ -18,16 +18,16 @@ class _GuessInputWidgetState extends State<GuessInputWidget> {
   ));
   
   List<String> _suggestions = [];
-  final TextEditingController _controller = TextEditingController();
+  late TextEditingController _controller;
   String? _selectedCountry;  // Add this variable to track selection
 
-  Future<void> _getSuggestions(String value) async {
+  Future<List<String>> _getSuggestions(String value) async {
     if (value.isEmpty) {
       setState(() {
         _suggestions = [];
         _selectedCountry = null;
       });
-      return;
+      return [];
     }
 
     try {
@@ -39,8 +39,21 @@ class _GuessInputWidgetState extends State<GuessInputWidget> {
           _selectedCountry = null;
         }
       });
+      return _suggestions;
     } catch (e) {
       print('Error getting suggestions: $e');
+      setState(() {
+        _suggestions = [];
+        _selectedCountry = null;
+      });
+      return [];
+    }
+  }
+
+  void _submitGuess(String value) {
+    if (_selectedCountry != null && _selectedCountry == value) {
+      widget.onSubmit(_selectedCountry!);
+      _controller.clear();
       setState(() {
         _suggestions = [];
         _selectedCountry = null;
@@ -55,65 +68,74 @@ class _GuessInputWidgetState extends State<GuessInputWidget> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(16.0),
-      child: Column(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey),
-              borderRadius: BorderRadius.circular(4),
+      padding: EdgeInsets.all(8.0),
+      child: Autocomplete<String>(
+        optionsBuilder: (TextEditingValue textEditingValue) {
+          return _getSuggestions(textEditingValue.text);
+        },
+        onSelected: (String value) {
+          setState(() {
+            _controller.text = value;  // Only update text
+            _selectedCountry = value;  // Store selection
+          });
+          // Removed automatic submission here
+        },
+        fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
+          _controller = controller;
+          return TextField(
+            controller: controller,
+            focusNode: focusNode,
+            decoration: InputDecoration(
+              hintText: 'Enter a country name',
+              suffixIcon: IconButton(
+                icon: Icon(Icons.send),
+                onPressed: () => _submitGuess(controller.text),  // Submit on button press
+              ),
             ),
-            child: Column(
-              children: [
-                TextField(
-                  controller: _controller,
-                  decoration: InputDecoration(
-                    labelText: 'Enter country name',
-                    contentPadding: EdgeInsets.all(8),
-                    border: InputBorder.none,
-                  ),
-                  onChanged: _getSuggestions,
+            textInputAction: TextInputAction.send,
+            onSubmitted: _submitGuess,  // Submit on keyboard action
+            keyboardType: TextInputType.text,
+            autocorrect: false,
+            enableSuggestions: true,
+          );
+        },
+        optionsViewBuilder: (context, onSelected, options) {
+          return Align(
+            alignment: Alignment.topLeft,
+            child: Material(
+              elevation: 8.0,
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.circular(4.0),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: MediaQuery.of(context).size.width * 0.9, // 90% of screen width
+                  maxHeight: MediaQuery.of(context).size.height * 0.4,
                 ),
-                if (_suggestions.isNotEmpty)
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border(
-                        top: BorderSide(color: Colors.grey),
+                child: ListView.builder(
+                  padding: EdgeInsets.zero,
+                  shrinkWrap: true,
+                  itemCount: options.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    final option = options.elementAt(index);
+                    return InkWell(
+                      onTap: () => onSelected(option),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16.0,
+                          vertical: 12.0,
+                        ),
+                        child: Text(
+                          option,
+                          style: TextStyle(fontSize: 16),
+                        ),
                       ),
-                    ),
-                    child: Column(
-                      children: _suggestions.map((suggestion) => ListTile(
-                        title: Text(suggestion),
-                        onTap: () {
-                          setState(() {
-                            _controller.text = suggestion;
-                            _selectedCountry = suggestion;
-                            _suggestions = [];
-                          });
-                        },
-                      )).toList(),
-                    ),
-                  ),
-              ],
+                    );
+                  },
+                ),
+              ),
             ),
-          ),
-          SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: _isValidGuess() 
-              ? () {
-                  if (_selectedCountry != null) {
-                    widget.onSubmit(_selectedCountry!);
-                    _controller.clear();
-                    setState(() {
-                      _suggestions = [];
-                      _selectedCountry = null;
-                    });
-                  }
-                }
-              : null,
-            child: Text('Submit Guess'),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
