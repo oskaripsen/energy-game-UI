@@ -4,34 +4,33 @@ on:
   push:
     branches: [ main ]
 
-permissions:
-  contents: write
-  pages: write
-  id-token: write
-
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: subosito/flutter-action@v2
+      - uses: actions/checkout@v3
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.10.0'  # Specify Flutter version
+          flutter-version: '3.10.0'
           channel: 'stable'
       
       - name: Install dependencies
         run: flutter pub get
         
       - name: Build web
-        run: flutter build web --release --base-href "/energy-game-UI/" --dart-define=API_URL=https://energy-game-api-6a18fc829f3d.herokuapp.com/
+        run: flutter build web --release --base-href "/energy-game-UI/"
         
-      # Add this step to create .nojekyll file
-      - name: Add .nojekyll file
-        run: touch ./build/web/.nojekyll
-        
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Create .nojekyll file
+        run: |
+          touch build/web/.nojekyll
+          touch .nojekyll
+          
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build/web
+          folder: build/web
+          branch: gh-pages
+          clean: true
