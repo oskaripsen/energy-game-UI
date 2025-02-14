@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import '../config.dart';  // Add this import
 
 class GuessInputWidget extends StatefulWidget {
   final Function(String) onSubmit;
@@ -12,13 +13,13 @@ class GuessInputWidget extends StatefulWidget {
 
 class _GuessInputWidgetState extends State<GuessInputWidget> {
   final _dio = Dio(BaseOptions(
-    baseUrl: 'http://localhost:5000',  // Changed from 127.0.0.1 to localhost
+    baseUrl: Config.apiUrl,  // Use Config instead of hardcoded URL
     connectTimeout: const Duration(seconds: 5),
     receiveTimeout: const Duration(seconds: 5),  // Added receive timeout
   ));
   
   List<String> _suggestions = [];
-  late final TextEditingController _controller;
+  late TextEditingController _controller;
   String? _selectedCountry;  // Add this variable to track selection
 
   @override
@@ -71,88 +72,88 @@ class _GuessInputWidgetState extends State<GuessInputWidget> {
     return _selectedCountry != null && _selectedCountry == _controller.text;
   }
 
-  void _showSuggestions(BuildContext context, List<String> suggestions) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (BuildContext bc) {
-        return Container(
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.height * 0.4,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 50,
-                height: 5,
-                margin: EdgeInsets.symmetric(vertical: 8),
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(2.5),
-                ),
-              ),
-              Expanded(
-                child: ListView.separated(
-                  itemCount: suggestions.length,
-                  separatorBuilder: (context, i) => Divider(height: 1),
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text(
-                        suggestions[index],
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      contentPadding: EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 12,
-                      ),
-                      onTap: () {
-                        setState(() {
-                          _selectedCountry = suggestions[index];
-                          _controller.text = suggestions[index];
-                        });
-                        Navigator.pop(context);
-                      },
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.all(8.0),
       child: Column(
         children: [
-          TextField(
-            controller: _controller,
-            decoration: InputDecoration(
-              hintText: 'Enter a country name',
-              border: OutlineInputBorder(),
-              suffixIcon: IconButton(
-                icon: Icon(Icons.send),
-                onPressed: () => _submitGuess(_controller.text),
+          Row(
+            children: [
+              Expanded(
+                child: Autocomplete<String>(
+                  optionsBuilder: (TextEditingValue textEditingValue) {
+                    return _getSuggestions(textEditingValue.text);
+                  },
+                  onSelected: (String value) {
+                    setState(() {
+                      _controller.text = value;
+                      _selectedCountry = value;
+                    });
+                  },
+                  fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
+                    _controller = controller;
+                    return TextField(
+                      controller: controller,
+                      focusNode: focusNode,
+                      decoration: InputDecoration(
+                        hintText: 'Enter a country name',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        filled: true,
+                        fillColor: Theme.of(context).cardColor,
+                      ),
+                      textInputAction: TextInputAction.next,
+                      keyboardType: TextInputType.text,
+                      autocorrect: false,
+                      enableSuggestions: true,
+                    );
+                  },
+                  optionsViewBuilder: (context, onSelected, options) {
+                    return Align(
+                      alignment: Alignment.topLeft,
+                      child: Material(
+                        elevation: 4,
+                        borderRadius: BorderRadius.circular(8),
+                        child: Container(
+                          constraints: BoxConstraints(
+                            maxHeight: 200,
+                            maxWidth: MediaQuery.of(context).size.width - 32,
+                          ),
+                          child: ListView.builder(
+                            padding: EdgeInsets.zero,
+                            shrinkWrap: true,
+                            itemCount: options.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              final option = options.elementAt(index);
+                              return ListTile(
+                                title: Text(option),
+                                onTap: () => onSelected(option),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
               ),
-            ),
-            onChanged: (value) async {
-              if (value.length >= 1) {
-                final suggestions = await _getSuggestions(value);
-                if (suggestions.isNotEmpty) {
-                  _showSuggestions(context, suggestions);
-                }
-              }
-            },
-            textInputAction: TextInputAction.search,
-            onSubmitted: _submitGuess,
-            keyboardType: TextInputType.text,
-            autocorrect: false,
-            enableSuggestions: true,
+              SizedBox(width: 8),
+              ElevatedButton(
+                onPressed: () => _submitGuess(_controller.text),
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: Text(
+                  'Guess',
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
+            ],
           ),
         ],
       ),
