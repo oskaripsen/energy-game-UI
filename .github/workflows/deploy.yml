@@ -4,7 +4,6 @@ on:
   push:
     branches: [ main ]
 
-# Add permissions
 permissions:
   contents: write
   pages: write
@@ -26,6 +25,10 @@ jobs:
         
       - name: Build web
         run: flutter build web --release --base-href "/energy-game-UI/" --dart-define=API_URL=https://energy-game-api-6a18fc829f3d.herokuapp.com/
+        
+      # Add this step to create .nojekyll file
+      - name: Add .nojekyll file
+        run: touch ./build/web/.nojekyll
         
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
