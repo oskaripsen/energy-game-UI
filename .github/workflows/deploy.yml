@@ -11,6 +11,17 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v3
+        with:
+          clean: true
+      
+      - name: Create clean .gitignore
+        run: |
+          echo "*.iml" > .gitignore
+          echo ".dart_tool/" >> .gitignore
+          echo "build/" >> .gitignore
+          echo ".flutter-plugins" >> .gitignore
+          echo ".flutter-plugins-dependencies" >> .gitignore
+          
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.10.0'
