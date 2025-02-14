@@ -4,33 +4,17 @@ on:
   push:
     branches: [ main ]
 
-permissions:
-  contents: write
-
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v3
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.10.0'
-          channel: 'stable'
+      - uses: subosito/flutter-action@v2
       
-      - name: Install dependencies
-        run: flutter pub get
-        
-      - name: Build web
-        run: |
-          flutter build web --release --base-href "/energy-game-UI/"
-          touch build/web/.nojekyll
+      - run: flutter pub get
+      - run: flutter build web --base-href "/energy-game-UI/"
       
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v4.0.0
+      - uses: peaceiris/actions-gh-pages@v3
         with:
-          personal_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: build/web
-          force_orphan: true
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build/web
