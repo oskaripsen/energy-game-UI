@@ -7,12 +7,18 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v3
       - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.10.0'
+          channel: 'stable'
       
       - run: flutter pub get
-      - run: flutter build web --base-href "/energy-game-UI/"
+      - run: flutter build web --release --base-href "/energy-game-UI/"
+      - run: touch build/web/.nojekyll
       
       - uses: peaceiris/actions-gh-pages@v3
         with:

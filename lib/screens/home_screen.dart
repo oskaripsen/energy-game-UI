@@ -24,10 +24,11 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    print('Using API URL: ${Config.apiUrl}'); // Debug print
     _dio = Dio(BaseOptions(
       baseUrl: Config.apiUrl,
-      connectTimeout: const Duration(seconds: 10),
-      receiveTimeout: const Duration(seconds: 10),  // Added receive timeout
+      connectTimeout: const Duration(seconds: 30), // Increased timeout
+      receiveTimeout: const Duration(seconds: 30),
       contentType: 'application/json',
     ));
     startGame();
@@ -43,7 +44,9 @@ class _HomeScreenState extends State<HomeScreen> {
     });
 
     try {
+      print('Attempting to connect to ${Config.apiUrl}/start_game'); // Debug print
       final response = await _dio.get('/start_game');
+      print('Response received: ${response.data}'); // Debug print
 
       if (!mounted) return;
 
@@ -61,10 +64,14 @@ class _HomeScreenState extends State<HomeScreen> {
         });
       }
     } catch (e) {
-      print("Error: $e");
+      print("Detailed error: $e"); // More detailed error
+      if (e is DioException) {
+        print("DioError type: ${e.type}"); // Show DioError type
+        print("DioError message: ${e.message}"); // Show error message
+      }
       if (!mounted) return;
       setState(() {
-        errorMessage = "Server connection failed. Is the server running?";
+        errorMessage = "Server connection failed (${e.toString()}). Is the server running?";
       });
     }
   }

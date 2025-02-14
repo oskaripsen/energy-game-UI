@@ -44,22 +44,10 @@
       "languageVersion": "3.3"
     },
     {
-      "name": "equatable",
-      "rootUri": "file:///C:/Users/oskar/AppData/Local/Pub/Cache/hosted/pub.dev/equatable-2.0.7",
-      "packageUri": "lib/",
-      "languageVersion": "2.12"
-    },
-    {
       "name": "fake_async",
       "rootUri": "file:///C:/Users/oskar/AppData/Local/Pub/Cache/hosted/pub.dev/fake_async-1.3.1",
       "packageUri": "lib/",
       "languageVersion": "2.12"
-    },
-    {
-      "name": "fl_chart",
-      "rootUri": "file:///C:/Users/oskar/AppData/Local/Pub/Cache/hosted/pub.dev/fl_chart-0.64.0",
-      "packageUri": "lib/",
-      "languageVersion": "3.0"
     },
     {
       "name": "flutter",
@@ -68,16 +56,16 @@
       "languageVersion": "3.3"
     },
     {
+      "name": "flutter_lints",
+      "rootUri": "file:///C:/Users/oskar/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_lints-2.0.3",
+      "packageUri": "lib/",
+      "languageVersion": "2.19"
+    },
+    {
       "name": "flutter_test",
       "rootUri": "file:///C:/flutter/packages/flutter_test",
       "packageUri": "lib/",
       "languageVersion": "3.3"
-    },
-    {
-      "name": "http",
-      "rootUri": "file:///C:/Users/oskar/AppData/Local/Pub/Cache/hosted/pub.dev/http-0.13.6",
-      "packageUri": "lib/",
-      "languageVersion": "2.19"
     },
     {
       "name": "http_parser",
@@ -108,6 +96,12 @@
       "rootUri": "file:///C:/Users/oskar/AppData/Local/Pub/Cache/hosted/pub.dev/leak_tracker_testing-3.0.1",
       "packageUri": "lib/",
       "languageVersion": "3.2"
+    },
+    {
+      "name": "lints",
+      "rootUri": "file:///C:/Users/oskar/AppData/Local/Pub/Cache/hosted/pub.dev/lints-2.1.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
     },
     {
       "name": "matcher",
@@ -203,10 +197,10 @@
       "name": "energy_game",
       "rootUri": "../",
       "packageUri": "lib/",
-      "languageVersion": "2.12"
+      "languageVersion": "3.0"
     }
   ],
-  "generated": "2025-02-12T17:51:06.637608Z",
+  "generated": "2025-02-14T09:44:13.962822Z",
   "generator": "pub",
   "generatorVersion": "3.6.1",
   "flutterRoot": "file:///C:/flutter",
