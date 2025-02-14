@@ -28,6 +28,7 @@ class _GuessInputWidgetState extends State<GuessInputWidget> {
     _controller = TextEditingController();
   }
 
+  // Modified _getSuggestions to limit suggestions to 2
   Future<List<String>> _getSuggestions(String value) async {
     if (value.isEmpty) {
       setState(() {
@@ -41,12 +42,11 @@ class _GuessInputWidgetState extends State<GuessInputWidget> {
       final response = await _dio.get('/suggestions', queryParameters: {'prefix': value});
       setState(() {
         _suggestions = List<String>.from(response.data);
-        // Clear selected country if it's no longer in suggestions
         if (!_suggestions.contains(_selectedCountry)) {
           _selectedCountry = null;
         }
       });
-      return _suggestions;
+      return _suggestions.take(2).toList();
     } catch (e) {
       print('Error getting suggestions: $e');
       setState(() {
@@ -117,14 +117,15 @@ class _GuessInputWidgetState extends State<GuessInputWidget> {
                       );
                     },
                     optionsViewBuilder: (context, onSelected, options) {
-                      // Wrap the suggestions list in a Padding to push it above the keyboard.
+                      final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+                      // Wrap suggestions list in Padding with extra bottom padding to keep it above the keyboard.
                       return Align(
                         alignment: Alignment.topLeft,
                         child: Material(
                           elevation: 4,
                           borderRadius: BorderRadius.circular(8),
                           child: Padding(
-                            padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+                            padding: EdgeInsets.only(bottom: bottomInset + 16),
                             child: ConstrainedBox(
                               constraints: BoxConstraints(
                                 maxHeight: MediaQuery.of(context).size.height * 0.3,
@@ -164,7 +165,7 @@ class _GuessInputWidgetState extends State<GuessInputWidget> {
                     ),
                   ),
                   child: Text(
-                    'Guess',
+                    'Guess!',
                     style: TextStyle(fontSize: 16),
                   ),
                 ),
