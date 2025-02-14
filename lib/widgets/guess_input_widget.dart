@@ -69,73 +69,82 @@ class _GuessInputWidgetState extends State<GuessInputWidget> {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.all(8.0),
-      child: Autocomplete<String>(
-        optionsBuilder: (TextEditingValue textEditingValue) {
-          return _getSuggestions(textEditingValue.text);
-        },
-        onSelected: (String value) {
-          setState(() {
-            _controller.text = value;  // Only update text
-            _selectedCountry = value;  // Store selection
-          });
-          // Removed automatic submission here
-        },
-        fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
-          _controller = controller;
-          return TextField(
-            controller: controller,
-            focusNode: focusNode,
-            decoration: InputDecoration(
-              hintText: 'Enter a country name',
-              suffixIcon: IconButton(
-                icon: Icon(Icons.send),
-                onPressed: () => _submitGuess(controller.text),  // Submit on button press
-              ),
-            ),
-            textInputAction: TextInputAction.send,
-            onSubmitted: _submitGuess,  // Submit on keyboard action
-            keyboardType: TextInputType.text,
-            autocorrect: false,
-            enableSuggestions: true,
-          );
-        },
-        optionsViewBuilder: (context, onSelected, options) {
-          return Align(
-            alignment: Alignment.topLeft,
-            child: Material(
-              elevation: 8.0,
-              color: Theme.of(context).colorScheme.surface,
-              borderRadius: BorderRadius.circular(4.0),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxWidth: MediaQuery.of(context).size.width * 0.9, // 90% of screen width
-                  maxHeight: MediaQuery.of(context).size.height * 0.4,
+      child: Column(  // Wrap in Column to contain suggestions below input
+        children: [
+          Autocomplete<String>(
+            optionsBuilder: (TextEditingValue textEditingValue) {
+              return _getSuggestions(textEditingValue.text);
+            },
+            onSelected: (String value) {
+              setState(() {
+                _controller.text = value;
+                _selectedCountry = value;
+              });
+            },
+            fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
+              _controller = controller;
+              return TextField(
+                controller: controller,
+                focusNode: focusNode,
+                decoration: InputDecoration(
+                  hintText: 'Enter a country name',
+                  suffixIcon: IconButton(
+                    icon: Icon(Icons.send),
+                    onPressed: () => _submitGuess(controller.text),
+                  ),
+                  border: OutlineInputBorder(),  // Add border for better visibility
                 ),
-                child: ListView.builder(
-                  padding: EdgeInsets.zero,
-                  shrinkWrap: true,
-                  itemCount: options.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    final option = options.elementAt(index);
-                    return InkWell(
-                      onTap: () => onSelected(option),
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 16.0,
-                          vertical: 12.0,
-                        ),
-                        child: Text(
-                          option,
-                          style: TextStyle(fontSize: 16),
-                        ),
-                      ),
-                    );
-                  },
+                textInputAction: TextInputAction.search,  // Changed to search
+                onSubmitted: _submitGuess,
+                keyboardType: TextInputType.text,
+                autocorrect: false,
+                enableSuggestions: true,
+              );
+            },
+            optionsViewBuilder: (context, onSelected, options) {
+              return Container(
+                margin: EdgeInsets.only(top: 8.0),
+                child: Card(
+                  elevation: 8.0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  child: Container(
+                    constraints: BoxConstraints(
+                      maxHeight: MediaQuery.of(context).size.height * 0.3,
+                    ),
+                    width: MediaQuery.of(context).size.width - 32,  // Full width minus padding
+                    child: ListView.separated(
+                      padding: EdgeInsets.zero,
+                      shrinkWrap: true,
+                      itemCount: options.length,
+                      separatorBuilder: (context, i) => Divider(height: 1),
+                      itemBuilder: (BuildContext context, int index) {
+                        final option = options.elementAt(index);
+                        return Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () => onSelected(option),
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 16.0,
+                                vertical: 16.0,  // Increased tap target
+                              ),
+                              child: Text(
+                                option,
+                                style: TextStyle(fontSize: 18),  // Increased text size
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          );
-        },
+              );
+            },
+          ),
+        ],
       ),
     );
   }
