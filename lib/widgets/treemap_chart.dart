@@ -13,17 +13,23 @@ class PieChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final validEntries = shares.entries.where((entry) => entry.value > 0).toList();
+    final total = shares.values.fold(0.0, (sum, v) => sum + v);
+    final List<ChartData> data = shares.entries.map((entry) {
+      final percentage = total > 0 ? (entry.value / total) * 100 : 0;
+      return ChartData(entry.key, percentage.toDouble()); // Explicitly convert to double
+    }).toList();
+
+    final validEntries = data.where((entry) => entry.value > 0).toList();
 
     return Container(
-      constraints: BoxConstraints(maxHeight: 350),  // Allow some room for the legend
+      constraints: BoxConstraints(maxHeight: 350), // Allow some room for the legend
       child: SingleChildScrollView(
         child: Column(
-          mainAxisSize: MainAxisSize.min,  // Important: use min
+          mainAxisSize: MainAxisSize.min, // Important: use min
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(
-              height: 200,  // Fixed height for the chart
+              height: 200, // Fixed height for the chart
               child: AspectRatio(
                 aspectRatio: 1,
                 child: CustomPaint(
@@ -46,10 +52,10 @@ class PieChart extends StatelessWidget {
                   Container(
                     width: 16,
                     height: 16,
-                    color: _getColorForSource(entry.key),
+                    color: _getColorForSource(entry.source),
                   ),
                   const SizedBox(width: 4),
-                  Text('${entry.key}: ${entry.value.toStringAsFixed(1)}%'),
+                  Text('${entry.source}: ${entry.value.toStringAsFixed(1)}%')
                 ],
               )).toList(),
             ),
@@ -67,7 +73,7 @@ class PieChart extends StatelessWidget {
       'Hydro': Colors.blue,
       'Nuclear': Colors.purple,
       'Solar': Colors.yellow,
-      'Wind': Colors.lightBlue,
+      'Wind': const Color.fromARGB(255, 20, 106, 146),
       'Biofuel': Colors.green,
       'Renewables': Colors.teal,
     };
@@ -76,7 +82,7 @@ class PieChart extends StatelessWidget {
 }
 
 class _PieChartPainter extends CustomPainter {
-  final List<MapEntry<String, double>> entries;
+  final List<ChartData> entries;
 
   _PieChartPainter(this.entries);
 
@@ -85,12 +91,12 @@ class _PieChartPainter extends CustomPainter {
     final total = entries.fold<double>(0.0, (double sum, entry) => sum + entry.value);
     double startAngle = -pi / 2;
     final center = Offset(size.width / 2, size.height / 2);
-    final radius = min(size.width, size.height) / 2;  // Use full radius
+    final radius = min(size.width, size.height) / 2; // Use full radius
     final paint = Paint()..style = PaintingStyle.fill;
-    
+
     for (final entry in entries) {
       final sweepAngle = (entry.value / total) * 2 * pi;
-      paint.color = _getColorForSource(entry.key);
+      paint.color = _getColorForSource(entry.source);
       canvas.drawArc(
         Rect.fromCircle(center: center, radius: radius),
         startAngle,
@@ -121,4 +127,11 @@ class _PieChartPainter extends CustomPainter {
     };
     return colors[source] ?? Colors.grey;
   }
+}
+
+class ChartData {
+  final String source;
+  final double value;
+
+  ChartData(this.source, this.value);
 }

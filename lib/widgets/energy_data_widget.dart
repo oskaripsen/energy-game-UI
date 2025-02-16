@@ -8,8 +8,9 @@ class EnergyDataWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Map<String, dynamic> shares = Map<String, dynamic>.from(energyData['energy_shares']);
-    final totalEnergy = energyData['total_energy_consumption'];
+    final Map<String, dynamic> shares = Map<String, dynamic>.from(energyData['electricity_shares']);
+    // Read total energy from the original key "electricity_generation"
+    final double totalEnergy = (energyData['electricity_generation'] ?? 0.0) as double;
 
     return Card(
       child: Padding(
@@ -19,7 +20,7 @@ class EnergyDataWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Total Energy Usage: ${totalEnergy.toStringAsFixed(1)} TWh',
+              'Total Electricity Generation: ${totalEnergy.toStringAsFixed(1)} TWh',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 16),
