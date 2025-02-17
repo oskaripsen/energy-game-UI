@@ -14,7 +14,7 @@ const RESOURCES = {"icons/Icon-maskable-512.png": "301a7604d45b3e739efc881eb0489
 "canvaskit/skwasm.js": "1df4d741f441fa1a4d10530ced463ef8",
 "canvaskit/canvaskit.wasm": "f48eaf57cada79163ec6dec7929486ea",
 "canvaskit/canvaskit.js": "76f7d822f42397160c5dfc69cbc9b2de",
-"main.dart.js": "c74c7054c4822501187aa9c0aaccc416",
+"main.dart.js": "e899aa828d93685452a216f93b80885e",
 "version.json": "9f68c899fefac7882b5bd5d5da405596",
 "assets/FontManifest.json": "7b2a36307916a9721811788013e65289",
 "assets/shaders/ink_sparkle.frag": "f8b80e740d33eb157090be4e995febdf",
