@@ -141,7 +141,7 @@ class _GuessInputWidgetState extends State<GuessInputWidget> {
                       child: TextField(
                         controller: _controller,
                         decoration: InputDecoration(
-                          hintText: 'Enter a country here',
+                          hintText: 'Enter a country here and guess',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
