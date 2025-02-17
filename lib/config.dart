@@ -1,6 +1,6 @@
 class Config {
   // Toggle this flag to switch environments
-  static const bool isDevelopment = false;  // true for local development, false for production
+  static const bool isDevelopment = true;  // true for local development, false for production
 
   // Choose the API URL based on the environment
   static String get apiUrl => isDevelopment

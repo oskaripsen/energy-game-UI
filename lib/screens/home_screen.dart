@@ -147,7 +147,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          EnergyDataWidget(energyData: energyData!),
+                          // Changed widget name and arguments to match EnergyPieChart's API
+                          EnergyPieChart(
+                            shares: Map<String, double>.from(energyData!['electricity_shares']),
+                            totalEnergy: energyData!['electricity_generation'],
+                          ),
                           if (guessHistory.isNotEmpty)
                             GuessHistoryWidget(guesses: guessHistory),
                           Padding(
